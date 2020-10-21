@@ -1,6 +1,5 @@
 ﻿using MVS_Store.Models.Data;
 using MVS_Store.Models.ViewModels.Account;
-using System.CodeDom;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
@@ -141,6 +140,31 @@ namespace MVS_Store.Controllers
         {
             FormsAuthentication.SignOut();
             return RedirectToAction("Login");
+        }
+        
+        public ActionResult UserNavPartial()
+        {
+            // отримати ім'я користувача
+            string userName = User.Identity.Name;
+
+            // оголошення моделі 
+            UserNavPartialViewModel model;
+
+            using (DB db = new DB())
+            {
+                // отримуємо користувача
+                UserDTO dto = db.Users.FirstOrDefault(x => x.UserName == userName);
+
+                // заповнюємо модель даними з контекста (DTO)
+                model = new UserNavPartialViewModel
+                {
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName
+                };
+            }
+
+            // повертаємо часткове представлення з моделлю
+            return PartialView(model);
         }
     }
 }
