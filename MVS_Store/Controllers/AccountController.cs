@@ -141,7 +141,7 @@ namespace MVS_Store.Controllers
             FormsAuthentication.SignOut();
             return RedirectToAction("Login");
         }
-        
+
         public ActionResult UserNavPartial()
         {
             // отримати ім'я користувача
@@ -165,6 +165,87 @@ namespace MVS_Store.Controllers
 
             // повертаємо часткове представлення з моделлю
             return PartialView(model);
+        }
+
+        // GET: /account/user-profile
+        [HttpGet]
+        [ActionName("user-profile")]
+        public ActionResult UserProfile()
+        {
+            // отримати ім'я користувача
+            string userName = User.Identity.Name;
+
+            // оголошення моделі
+            UserProfileViewModel model;
+
+            using (DB db = new DB())
+            {
+                // отримуємо користувача
+                UserDTO dto = db.Users.FirstOrDefault(x => x.UserName == userName);
+
+                // ініціалізація моделі даними
+                model = new UserProfileViewModel(dto);
+            }
+
+            // повертаємо модель в представлення
+            return View("UserProfile", model);
+        }
+
+        // POST: /account/user-profile
+        [HttpPost]
+        [ActionName("user-profile")]
+        public ActionResult UserProfile(UserProfileViewModel model)
+        {
+            // перевірка моделі на валідність
+            if (!ModelState.IsValid)
+            {
+                return View("UserProfile", model);
+            }
+
+            // перевірка пароля (якщо користувач його міняє)
+            if (!string.IsNullOrWhiteSpace(model.Password) && !model.Password.Equals(model.ConfirmPassword))
+            {
+                ModelState.AddModelError("", "Passwords do not match");
+
+                return View("UserProfile", model);
+            }
+
+            using (DB db = new DB())
+            {
+                // отримуємо ім'я користувача
+                string userName = User.Identity.Name;
+
+                // перевірка імені на унікальність
+                if (db.Users.Where(x => x.ID != model.ID).Any(x => x.UserName == userName))
+                {
+                    ModelState.AddModelError("", $"Username {model.UserName} already exist.");
+                    model.UserName = "";
+
+                    return View("UserProfile", model);
+                }
+
+                // змінюємо контекст даних
+                UserDTO dto = db.Users.Find(model.ID);
+
+                dto.FirstName = model.FirstName;
+                dto.LastName = model.LastName;
+                dto.EmailAddress = model.EmailAddress;
+                dto.UserName = model.UserName;
+
+                if (!string.IsNullOrWhiteSpace(model.Password))
+                {
+                    dto.Password = model.Password;
+                }
+
+                // зберігаємо зміни
+                db.SaveChanges();
+            }
+
+            // встановлюємо повідомлення в TempData
+            TempData["SM"] = "You have edited your profile!";
+
+            // повертаємо представлення з моделлю
+            return View("userProfile", model);
         }
     }
 }

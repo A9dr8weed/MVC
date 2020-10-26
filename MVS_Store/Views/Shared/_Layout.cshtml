@@ -33,6 +33,11 @@
                         <li>@Html.ActionLink("Login", "Login", "Account", null, new { @class = "navbar-text", style = "text-decoration: none" })</li>
                     }
                 }
+
+                @if (Request.IsAuthenticated)
+                {
+                    <li>@Html.Action("UserNavPartial", "Account", new { area = ""})</li>
+                }
             </ul>
             <span class="navbar-text">
                 @Html.Action("CartPartial", "Cart")
