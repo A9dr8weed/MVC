@@ -4,12 +4,9 @@ namespace MVS_Store.Models.ViewModels.Shop
 {
     public class CategoryViewModel
     {
-        public CategoryViewModel ()
-        {
+        public CategoryViewModel() { }
 
-        }
-
-        public CategoryViewModel (CategoryDTO row)
+        public CategoryViewModel(CategoryDTO row)
         {
             ID = row.ID;
             Name = row.Name;

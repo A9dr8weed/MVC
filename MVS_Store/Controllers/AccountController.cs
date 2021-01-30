@@ -196,6 +196,8 @@ namespace MVS_Store.Controllers
         [ActionName("user-profile")]
         public ActionResult UserProfile(UserProfileViewModel model)
         {
+            bool userNameIsChanged = false;
+
             // перевірка моделі на валідність
             if (!ModelState.IsValid)
             {
@@ -214,6 +216,13 @@ namespace MVS_Store.Controllers
             {
                 // отримуємо ім'я користувача
                 string userName = User.Identity.Name;
+
+                // перевірка зміни імені
+                if (userName != model.UserName)
+                {
+                    userName = model.UserName;
+                    userNameIsChanged = true;
+                }
 
                 // перевірка імені на унікальність
                 if (db.Users.Where(x => x.ID != model.ID).Any(x => x.UserName == userName))
@@ -243,9 +252,16 @@ namespace MVS_Store.Controllers
 
             // встановлюємо повідомлення в TempData
             TempData["SM"] = "You have edited your profile!";
-
+            
             // повертаємо представлення з моделлю
-            return View("userProfile", model);
+            if (!userNameIsChanged)
+            {
+                return View("userProfile", model);
+            }
+            else
+            {
+                return RedirectToAction("Logout");
+            }
         }
     }
 }

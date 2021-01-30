@@ -11,5 +11,7 @@ namespace MVS_Store.Models.Data
         public DbSet<UserDTO> Users { get; set; } // зв'язок між моделлю і БД
         public DbSet<RoleDTO> Roles { get; set; } // зв'язок між моделлю і БД
         public DbSet<UserRoleDTO> UserRoles { get; set; } // зв'язок між моделлю і БД
+        public DbSet<OrderDTO> Orders { get; set; } // зв'язок між моделлю і БД
+        public DbSet<OrderDetailsDTO> OrderDetails { get; set; } // зв'язок між моделлю і БД
     }
 }
